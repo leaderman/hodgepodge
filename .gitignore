@@ -1,3 +1,4 @@
 /.idea/
 /**/*.iml
 /**/target/
+/common/src/main/resources/config.properties
