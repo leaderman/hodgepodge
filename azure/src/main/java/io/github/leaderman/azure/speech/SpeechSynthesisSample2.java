@@ -3,7 +3,9 @@ package io.github.leaderman.azure.speech;
 import com.microsoft.cognitiveservices.speech.*;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 import io.github.leaderman.hodgepodge.common.Config;
+import io.github.leaderman.hodgepodge.common.File;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class SpeechSynthesisSample2 {
@@ -13,13 +15,19 @@ public class SpeechSynthesisSample2 {
 
         SpeechConfig config = SpeechConfig.fromSubscription(subscription, region);
 
-        String language = "en-CA";
+        String language = "zh-CN";
         config.setSpeechSynthesisLanguage(language);
 
         String voice = "zh-CN-XiaochenNeural";
         config.setSpeechSynthesisVoiceName(voice);
 
-        String text = "你好，世界！";
+        String text;
+        try {
+            text = File.text("text");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         String output = "/tmp/outputaudio.wav";
 
         try (
@@ -29,7 +37,8 @@ public class SpeechSynthesisSample2 {
                 SpeechSynthesisResult result = synthesizer.SpeakTextAsync(text).get()
         ) {
             if (result.getReason() == ResultReason.SynthesizingAudioCompleted) {
-                System.out.println("Speech synthesized to speaker for text [" + text + "]");
+                System.out.println("Speech synthesized to speaker for text [" + text + "], duration: " +
+                        result.getAudioDuration() + " ns");
             } else if (result.getReason() == ResultReason.Canceled) {
                 SpeechSynthesisCancellationDetails cancellation = SpeechSynthesisCancellationDetails.fromResult(result);
                 System.out.println("CANCELED: Reason=" + cancellation.getReason());
