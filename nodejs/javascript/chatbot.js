@@ -32,11 +32,21 @@ function onLogout(user) {
 }
 
 async function onMessage(msg) {
-  log.info("ChatBot", msg.toString());
+  const room = msg.room();
+  const talker = msg.talker();
+  const type = msg.type();
+  const text = msg.text();
 
-  if (msg.text() === "ding") {
-    await msg.say("dong");
-  }
+  log.info(
+    "ChatBot",
+    "message from room: %s, user: %s, type: %s, text: %s",
+    room ? await room.topic() : "{}",
+    talker ? talker.name() : "{}",
+    type,
+    text
+  );
+
+  await msg.say("回复[" + text + "]");
 }
 
 function onError(error) {
