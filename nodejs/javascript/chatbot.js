@@ -32,10 +32,24 @@ function onLogout(user) {
 }
 
 async function onMessage(msg) {
+  const self = msg.self();
+  if (self) {
+    // 自己发送的消息，不处理
+    return;
+  }
+
+  // 消息群聊
   const room = msg.room();
+  // 消息发送者
   const talker = msg.talker();
+  // 消息类型
   const type = msg.type();
-  const text = msg.text();
+  // 消息文本
+  let text = msg.text().trim();
+  if (!text) {
+    // 消息文本为空，不处理
+    return;
+  }
 
   log.info(
     "ChatBot",
@@ -46,7 +60,17 @@ async function onMessage(msg) {
     text
   );
 
-  await msg.say("回复[" + text + "]");
+  if (text.includes(Config.chatbot_reference_separator)) {
+    // 引用
+    text = text.split(Config.chatbot_reference_separator)[1].trim();
+  }
+
+  if (text.startsWith(Config.chatbot_self_name)) {
+    // @
+    text = text.substring(Config.chatbot_self_name.length).trim();
+  }
+
+  await msg.say("[" + text + "]");
 }
 
 function onError(error) {
