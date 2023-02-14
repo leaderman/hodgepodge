@@ -80,7 +80,7 @@ function onError(error) {
 process.env.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT = true;
 
 const bot = WechatyBuilder.build({
-  name: "ding-dong-bot",
+  name: "ChatBot",
   puppet: "wechaty-puppet-service",
   puppetOptions: {
     token: Config.chatbot_puppet_workpro_token,
