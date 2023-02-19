@@ -2,6 +2,8 @@ import { WechatyBuilder, ScanStatus, log } from "wechaty";
 import qrcodeTerminal from "qrcode-terminal";
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "redis";
+import axios from "axios";
+
 import Config from "../config.js";
 
 function onScan(qrcode, status) {
@@ -84,15 +86,30 @@ async function onMessage(msg) {
     text = text.substring(Config.chatbot_self_name.length).trim();
   }
 
-  if (!text) {
-    // 消息为空，不处理
-    return;
+  let mid = uuidv4();
+  let reply = "";
+
+  if (text) {
+    if (text === Config.black_rabbit_activity) {
+      /* 
+        查询活动 
+      */
+      reply = await getActivityNames();
+      console.log(reply);
+    } else {
+      /*
+        对话
+      */
+
+      // 推送消息
+      await push(mid, room ? roomId : userId, text);
+      // 拉取回复消息
+      reply = await pull(mid);
+    }
+  } else {
+    reply = Config.black_rabbit_greeting;
   }
 
-  // 推送消息
-  const mid = await push(room ? roomId : userId, text);
-  // 拉取回复消息
-  let reply = await pull(mid);
   if (reply) {
     await msg.say(reply);
   }
@@ -111,15 +128,41 @@ async function onMessage(msg) {
 }
 
 /**
+ * 获取活动名称列表。
+ *
+ * @returns {Promise<String>} 活动名称列表（多行字符串）
+ */
+async function getActivityNames() {
+  const response = await axios.get(
+    Config.meetu_api_address + Config.meetu_api_activity_get_recoms,
+    {
+      headers: {
+        token: Config.meetu_api_token,
+      },
+      params: {
+        page: 1,
+        pageSize: Config.meetu_api_activity_get_recoms_max,
+      },
+    }
+  );
+
+  const activities = response.data.data;
+  if (!activities || !activities.length) {
+    return "";
+  }
+
+  return activities.map((activity) => activity.name).join("\n");
+}
+
+/**
  * 推送消息。
  *
+ * @param {String} mid 消息 ID
  * @param {String} chatId 会话 ID
  * @param {String} message 消息文本
  * @returns {Promise<String>} 消息 ID
  */
-async function push(chatId, text) {
-  const mid = uuidv4();
-
+async function push(mid, chatId, text) {
   const entity = {
     mid: mid,
     chatId: chatId,

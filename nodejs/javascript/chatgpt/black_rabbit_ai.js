@@ -103,6 +103,7 @@ while (true) {
   // AI
   const response = context
     ? await api.sendMessage(text, {
+        promptPrefix: Config.black_rabbit_prompt,
         conversationId: context.conversationId,
         parentMessageId: context.parentMessageId,
       })
