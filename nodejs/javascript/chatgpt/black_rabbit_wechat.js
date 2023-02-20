@@ -110,9 +110,11 @@ async function onMessage(msg) {
     reply = Config.black_rabbit_greeting;
   }
 
-  if (reply) {
-    await msg.say(reply);
+  if (!reply) {
+    reply = Config.balck_rabbit_busy;
   }
+
+  await msg.say(reply);
 
   // 打印 ChatGPT 消息
   log.info(
