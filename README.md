@@ -13,6 +13,10 @@
 - [增强版示例，支持获取消息群聊、发送者、类型和内容](https://github.com/leaderman/hodgepodge/blob/main/nodejs/javascript/chatbot_pers.js)
 - [企业微信示例，使用 WorkPro 实现](https://github.com/leaderman/hodgepodge/blob/main/nodejs/javascript/chatbot_corp.js)
 
+**OpenAI**
+
+- [ChatGPT 对话示例](https://github.com/leaderman/hodgepodge/blob/main/nodejs/javascript/chatgpt/openai_chat_demo.js)
+
 **Node.js**
 
 - [使用 mysql2 实现 MySQL CRUD](https://github.com/leaderman/hodgepodge/blob/main/nodejs/javascript/example/mysql_crud.js)
