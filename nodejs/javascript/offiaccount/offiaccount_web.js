@@ -3,6 +3,7 @@ import url from "url";
 import crypto from "crypto";
 
 import Config from "../config.js";
+import { resolve } from "path";
 
 function deepWithWideGet(request, response) {
   const query = url.parse(request.url, true).query;
@@ -29,7 +30,12 @@ function deepWithWideGet(request, response) {
   }
 }
 
-function deepWithWidePost(request, response) {}
+async function deepWithWidePost(request, response) {
+  const body = await getBody(request);
+  console.log(body);
+
+  text(response, "");
+}
 
 function deepWithWide(request, response) {
   const method = request.method;
@@ -42,6 +48,20 @@ function deepWithWide(request, response) {
       deepWithWidePost(request, response);
       break;
   }
+}
+
+async function getBody(request) {
+  return new Promise((resolve, _) => {
+    let body = "";
+
+    request.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    request.on("end", () => {
+      resolve(body);
+    });
+  });
 }
 
 function text(response, text) {
