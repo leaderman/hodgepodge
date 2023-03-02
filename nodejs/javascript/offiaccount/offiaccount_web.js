@@ -50,7 +50,6 @@ function text(response, text) {
   response.end(text);
 }
 
-const hostname = Config.offiaccount_web_host;
 const port = Config.offiaccount_web_port;
 
 const server = http.createServer((request, response) => {
@@ -62,6 +61,6 @@ const server = http.createServer((request, response) => {
   }
 });
 
-server.listen(port, hostname, () => {
+server.listen(port, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
