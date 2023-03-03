@@ -311,7 +311,10 @@ async function deepWithWidePost(request, response) {
   const signature = query.signature;
   const timestamp = query.timestamp;
   const nonce = query.nonce;
+
   const openid = query.openid;
+  console.log("openid:", openid);
+
   const msgSignature = query.msg_signature;
 
   let body = await getBody(request);
@@ -355,12 +358,15 @@ async function deepWithWidePost(request, response) {
     reci.xml.CreateTime,
     reci.xml.Content
   );
+  console.log("native:", native);
 
   // 加密原生消息
   encrypt = encryptResp(native);
+  console.log("encrypt:", encrypt);
 
   // 包装消息
   const wrap = generateWrap(timestamp, nonce, encrypt);
+  console.log("wrap:", wrap);
 
   // 响应
   xml(response, wrap);
