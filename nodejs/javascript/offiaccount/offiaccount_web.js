@@ -6,6 +6,49 @@ import { Buffer } from "buffer";
 
 import Config from "../config.js";
 
+/**
+ * XML 转换 JSON。
+ *
+ * @param {String} xml XML
+ * @returns {Object} JSON
+ */
+async function xmlToJson(xml) {
+  const parser = new xml2js.Parser({ explicitArray: false });
+
+  return new Promise((resolve, reject) => {
+    parser.parseString(xml, (error, json) => {
+      if (error) {
+        reject(error);
+      }
+
+      resolve(json);
+    });
+  });
+}
+
+/**
+ * JSON 转换 XML。
+ *
+ * @param {Object} json JSON
+ * @returns {String} XML
+ */
+function jsonToXml(json) {
+  const builder = new xml2js.Builder({
+    headless: true,
+  });
+
+  return builder.buildObject(json);
+}
+
+/**
+ * 签名。
+ *
+ * @param {String} token 微信开放平台上，服务方设置的接收消息的校验 token
+ * @param {String} timestamp URL 上原有参数,时间戳
+ * @param {String} nonce URL 上原有参数,随机数
+ * @param {String} encrypt 密文
+ * @returns {String} 签名
+ */
 function getSign(token, timestamp, nonce, encrypt) {
   let seeds = [];
 
@@ -25,6 +68,7 @@ function getSign(token, timestamp, nonce, encrypt) {
     seeds.push(encrypt);
   }
 
+  // 字典序
   seeds.sort();
   seeds = seeds.join("");
 
@@ -32,44 +76,6 @@ function getSign(token, timestamp, nonce, encrypt) {
   shasum.update(seeds);
 
   return shasum.digest("hex");
-}
-
-function deepWithWideGet(request, response) {
-  const query = url.parse(request.url, true).query;
-
-  const signature = query.signature;
-  const echostr = query.echostr;
-  const timestamp = query.timestamp;
-  const nonce = query.nonce;
-
-  const sign = getSign(Config.offiaccount_token_deepwithwide, timestamp, nonce);
-  if (signature === sign) {
-    text(response, echostr);
-  } else {
-    text(response, "");
-  }
-}
-
-async function xmlToJson(xml) {
-  const parser = new xml2js.Parser({ explicitArray: false });
-
-  return new Promise((resolve, reject) => {
-    parser.parseString(xml, (error, json) => {
-      if (error) {
-        reject(error);
-      }
-
-      resolve(json);
-    });
-  });
-}
-
-function jsonToXml(json) {
-  const builder = new xml2js.Builder({
-    headless: true,
-  });
-
-  return builder.buildObject(json);
 }
 
 /**
@@ -166,82 +172,12 @@ function decryptReci(encrypt) {
   return msg;
 }
 
-async function deepWithWidePost(request, response) {
-  const query = url.parse(request.url, true).query;
-
-  const signature = query.signature;
-  const timestamp = query.timestamp;
-  const nonce = query.nonce;
-  const openid = query.openid;
-  const encryptType = query.encrypt_type;
-  const msgSignature = query.msg_signature;
-
-  let body = await getBody(request);
-  console.log(body);
-  body = await xmlToJson(body);
-  console.log(body);
-
-  const toUserName = body.xml.ToUserName;
-  let encrypt = body.xml.Encrypt;
-
-  let sign = getSign(
-    Config.offiaccount_token_deepwithwide,
-    timestamp,
-    nonce,
-    encrypt
-  );
-
-  let reci = decryptReci(encrypt);
-  reci = await xmlToJson(reci);
-
-  const content = reci.xml.Content;
-
-  let resp = {};
-  resp.xml = {};
-
-  resp.xml.ToUserName = reci.xml.FromUserName;
-  resp.xml.FromUserName = reci.xml.ToUserName;
-  resp.xml.CreateTime = reci.xml.CreateTime;
-  resp.xml.MsgType = reci.xml.MsgType;
-  resp.xml.Content = reci.xml.Content;
-
-  resp = jsonToXml(resp);
-
-  encrypt = encryptResp(resp);
-
-  sign = getSign(
-    Config.offiaccount_token_deepwithwide,
-    timestamp,
-    nonce,
-    encrypt
-  );
-
-  resp = {};
-  resp.xml = {};
-
-  resp.xml.Encrypt = encrypt;
-  resp.xml.MsgSignature = sign;
-  resp.xml.TimeStamp = timestamp;
-  resp.xml.Nonce = nonce;
-
-  resp = jsonToXml(resp);
-
-  xml(response, resp);
-}
-
-function deepWithWide(request, response) {
-  const method = request.method;
-  switch (method) {
-    case "GET":
-      deepWithWideGet(request, response);
-      break;
-
-    case "POST":
-      deepWithWidePost(request, response);
-      break;
-  }
-}
-
+/**
+ * 获取 POST 请求体。
+ *
+ * @param {Object} request 请求
+ * @returns {Promise<String>} 请求体
+ */
 async function getBody(request) {
   return new Promise((resolve, _) => {
     let body = "";
@@ -256,18 +192,200 @@ async function getBody(request) {
   });
 }
 
+/**
+ * 构建原生响应消息。
+ *
+ * @param {String} toUserName 接收方账号
+ * @param {String} fromUserName 发送方账号
+ * @param {String} createTime 消息创建时间
+ * @param {String} content 消息内容
+ * @returns {String} 原生响应消息（XML）
+ */
+function generateNative(toUserName, fromUserName, createTime, content) {
+  const native = {};
+  native.xml = {};
+
+  native.xml.ToUserName = fromUserName;
+  native.xml.FromUserName = toUserName;
+  native.xml.CreateTime = createTime;
+  native.xml.MsgType = "text";
+  native.xml.Content = content;
+
+  return jsonToXml(native);
+}
+
+/**
+ * 构建包装响应消息。
+ *
+ * @param {String} timestamp URL 上原有参数
+ * @param {String} nonce URL 上原有参数
+ * @param {String} encrypt 密文
+ * @returns {String} 包装响应消息（XML）
+ */
+function generateWrap(timestamp, nonce, encrypt) {
+  const sign = getSign(
+    Config.offiaccount_token_deepwithwide,
+    timestamp,
+    nonce,
+    encrypt
+  );
+
+  const wrap = {};
+  wrap.xml = {};
+
+  wrap.xml.Encrypt = encrypt;
+  wrap.xml.MsgSignature = sign;
+  wrap.xml.TimeStamp = timestamp;
+  wrap.xml.Nonce = nonce;
+
+  return jsonToXml(wrap);
+}
+
+/**
+ * 响应文本。
+ *
+ * @param {Object} response 响应
+ * @param {String} text 文本
+ */
 function text(response, text) {
   response.statusCode = 200;
   response.setHeader("Content-Type", "text/plain");
   response.end(text);
 }
 
+/**
+ * 响应 XML。
+ *
+ * @param {Object} response 响应
+ * @param {String} xml XML
+ */
 function xml(response, xml) {
   response.statusCode = 200;
   response.setHeader("Content-Type", "application/xml");
   response.end(xml);
 }
 
+/**
+ * 响应错误。
+ *
+ * @param {Object} response 响应
+ * @param {String} text 文本
+ */
+function error(response, text) {
+  response.statusCode = 500;
+  response.setHeader("Content-Type", "text/plain");
+  response.end(text);
+}
+
+/**
+ * 公众号 GET 请求，用于验证微信服务器消息。
+ *
+ * @param {Object} request 请求
+ * @param {Object} response 响应
+ */
+function deepWithWideGet(request, response) {
+  const query = url.parse(request.url, true).query;
+
+  const signature = query.signature;
+  const echostr = query.echostr;
+  const timestamp = query.timestamp;
+  const nonce = query.nonce;
+
+  const sign = getSign(Config.offiaccount_token_deepwithwide, timestamp, nonce);
+  if (signature === sign) {
+    text(response, echostr);
+  } else {
+    text(response, "");
+  }
+}
+
+/**
+ * 公众号 POST 请求。
+ *
+ * @param {Object} request 请求
+ * @param {Object} response 响应
+ */
+async function deepWithWidePost(request, response) {
+  const query = url.parse(request.url, true).query;
+
+  const signature = query.signature;
+  const timestamp = query.timestamp;
+  const nonce = query.nonce;
+  const openid = query.openid;
+
+  const encryptType = query.encrypt_type;
+  if (encryptType !== "text") {
+    // 非文本消息，不处理
+    text(response, "success");
+
+    return;
+  }
+
+  const msgSignature = query.msg_signature;
+
+  let body = await getBody(request);
+  body = await xmlToJson(body);
+
+  // 密文
+  let encrypt = body.xml.Encrypt;
+
+  let sign = getSign(
+    Config.offiaccount_token_deepwithwide,
+    timestamp,
+    nonce,
+    encrypt
+  );
+  if (msgSignature !== sign) {
+    error(response, "签名错误");
+
+    return;
+  }
+
+  // 解密
+  let reci = decryptReci(encrypt);
+  reci = await xmlToJson(reci);
+
+  // 消息
+  const content = reci.xml.Content;
+
+  // 原生消息
+  const native = generateNative(
+    reci.xml.FromUserName,
+    reci.xml.ToUserName,
+    reci.xml.CreateTime,
+    reci.xml.Content
+  );
+
+  // 加密原生消息
+  encrypt = encryptResp(resp);
+
+  // 包装消息
+  const wrap = generateWrap(timestamp, nonce, encrypt);
+
+  // 响应
+  xml(response, wrap);
+}
+
+/**
+ * 公众号请求。
+ *
+ * @param {Object} request 请求
+ * @param {Object} response 响应
+ */
+function deepWithWide(request, response) {
+  const method = request.method;
+  switch (method) {
+    case "GET":
+      deepWithWideGet(request, response);
+      break;
+
+    case "POST":
+      deepWithWidePost(request, response);
+      break;
+  }
+}
+
+// 端口
 const port = Config.offiaccount_web_port;
 
 const server = http.createServer((request, response) => {
@@ -279,6 +397,7 @@ const server = http.createServer((request, response) => {
   }
 });
 
+// 服务监听
 server.listen(port, () => {
   console.log(`Server running on ${port}`);
 });
