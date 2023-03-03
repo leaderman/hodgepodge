@@ -20,3 +20,5 @@ res = await api.sendMessage("What were we talking about?", {
   parentMessageId: res.id,
 });
 console.log(res.text);
+
+console.log(res);
