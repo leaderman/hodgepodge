@@ -362,7 +362,6 @@ async function deepWithWidePost(request, response) {
 
   // 加密原生消息
   encrypt = encryptResp(native);
-  console.log("encrypt:", encrypt);
 
   // 包装消息
   const wrap = generateWrap(timestamp, nonce, encrypt);
