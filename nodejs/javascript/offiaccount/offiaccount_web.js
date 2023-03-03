@@ -346,6 +346,7 @@ async function deepWithWidePost(request, response) {
 
   // 消息
   const content = reci.xml.Content;
+  console.log("content:", content);
 
   // 原生消息
   const native = generateNative(
