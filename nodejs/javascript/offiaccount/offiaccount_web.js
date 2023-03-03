@@ -205,8 +205,8 @@ function generateNative(toUserName, fromUserName, createTime, content) {
   const native = {};
   native.xml = {};
 
-  native.xml.ToUserName = fromUserName;
-  native.xml.FromUserName = toUserName;
+  native.xml.ToUserName = toUserName;
+  native.xml.FromUserName = fromUserName;
   native.xml.CreateTime = createTime;
   native.xml.MsgType = "text";
   native.xml.Content = content;
@@ -311,16 +311,16 @@ async function deepWithWidePost(request, response) {
   const signature = query.signature;
   const timestamp = query.timestamp;
   const nonce = query.nonce;
+
   const openid = query.openid;
-  const encryptType = query.encrypt_type;
+  console.log("openid:", openid);
+
   const msgSignature = query.msg_signature;
 
   let body = await getBody(request);
-  console.log(body);
   body = await xmlToJson(body);
-  console.log(body);
 
-  const toUserName = body.xml.ToUserName;
+  // 密文
   let encrypt = body.xml.Encrypt;
 
   let sign = getSign(
@@ -329,43 +329,47 @@ async function deepWithWidePost(request, response) {
     nonce,
     encrypt
   );
+  if (msgSignature !== sign) {
+    error(response, "签名错误");
 
+    return;
+  }
+
+  // 解密
   let reci = decryptReci(encrypt);
   reci = await xmlToJson(reci);
 
+  const msgType = reci.xml.MsgType;
+  if (msgType !== "text") {
+    // 非文本消息，不处理
+    text(response, "success");
+
+    return;
+  }
+
+  // 消息
   const content = reci.xml.Content;
+  console.log("content:", content);
 
-  let resp = {};
-  resp.xml = {};
-
-  resp.xml.ToUserName = reci.xml.FromUserName;
-  resp.xml.FromUserName = reci.xml.ToUserName;
-  resp.xml.CreateTime = reci.xml.CreateTime;
-  resp.xml.MsgType = reci.xml.MsgType;
-  resp.xml.Content = reci.xml.Content;
-
-  resp = jsonToXml(resp);
-
-  encrypt = encryptResp(resp);
-
-  sign = getSign(
-    Config.offiaccount_token_deepwithwide,
-    timestamp,
-    nonce,
-    encrypt
+  // 原生消息
+  const native = generateNative(
+    reci.xml.FromUserName,
+    reci.xml.ToUserName,
+    reci.xml.CreateTime,
+    reci.xml.Content
   );
+  console.log("native:", native);
 
-  resp = {};
-  resp.xml = {};
+  // 加密原生消息
+  encrypt = encryptResp(native);
+  console.log("encrypt:", encrypt);
 
-  resp.xml.Encrypt = encrypt;
-  resp.xml.MsgSignature = sign;
-  resp.xml.TimeStamp = timestamp;
-  resp.xml.Nonce = nonce;
+  // 包装消息
+  const wrap = generateWrap(timestamp, nonce, encrypt);
+  console.log("wrap:", wrap);
 
-  resp = jsonToXml(resp);
-
-  xml(response, resp);
+  // 响应
+  xml(response, wrap);
 }
 
 /**
