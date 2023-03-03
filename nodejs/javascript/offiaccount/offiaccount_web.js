@@ -312,15 +312,6 @@ async function deepWithWidePost(request, response) {
   const timestamp = query.timestamp;
   const nonce = query.nonce;
   const openid = query.openid;
-
-  const encryptType = query.encrypt_type;
-  if (encryptType !== "text") {
-    // 非文本消息，不处理
-    text(response, "success");
-
-    return;
-  }
-
   const msgSignature = query.msg_signature;
 
   let body = await getBody(request);
@@ -344,6 +335,14 @@ async function deepWithWidePost(request, response) {
   // 解密
   let reci = decryptReci(encrypt);
   reci = await xmlToJson(reci);
+
+  const msgType = reci.xml.MsgType;
+  if (msgType !== "text") {
+    // 非文本消息，不处理
+    text(response, "success");
+
+    return;
+  }
 
   // 消息
   const content = reci.xml.Content;
