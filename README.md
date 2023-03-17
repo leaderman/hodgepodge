@@ -25,3 +25,4 @@
 
 - [使用 Viper 实现配置工具类](https://github.com/leaderman/hodgepodge/blob/main/go/config/config.go)
 - [配置工具类测试用例](https://github.com/leaderman/hodgepodge/blob/main/go/config/config_test.go)
+- [使用 GORM 实现 MySQL CRUD 示例](https://github.com/leaderman/hodgepodge/blob/main/go/example/rds_mysql_test.go)
