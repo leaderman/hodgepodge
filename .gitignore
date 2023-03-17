@@ -4,3 +4,4 @@
 /common/src/main/resources/config.properties
 /nodejs/javascript/node_modules/
 /nodejs/javascript/config.js
+go/resources/config.yaml
