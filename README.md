@@ -20,3 +20,8 @@
 **Node.js**
 
 - [使用 mysql2 实现 MySQL CRUD](https://github.com/leaderman/hodgepodge/blob/main/nodejs/javascript/example/mysql_crud.js)
+
+**Golang**
+
+- [使用 Viper 实现配置工具类](https://github.com/leaderman/hodgepodge/blob/main/go/config/config.go)
+- [配置工具类测试用例](https://github.com/leaderman/hodgepodge/blob/main/go/config/config_test.go)
