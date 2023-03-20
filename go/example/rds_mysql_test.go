@@ -60,11 +60,15 @@ func TestCreates(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	for index, user := range users {
+		t.Logf("user[%v]: %v", index, user.ID)
+	}
+
 	t.Logf("affected: %v", result.RowsAffected)
 }
 
 func TestQueryById(t *testing.T) {
-	id := 1
+	id := 5
 	user := User{}
 
 	result := db.First(&user, id)
@@ -160,9 +164,9 @@ func TestUpdate(t *testing.T) {
 
 func TestUpdates(t *testing.T) {
 	minId := 0
-	age := 35
+	user := User{Age: 35}
 
-	result := db.Where("id > ?", minId).Updates(User{Age: age})
+	result := db.Where("id > ?", minId).Updates(user)
 	if err := result.Error; err != nil {
 		t.Fatal(err)
 	}
