@@ -5,26 +5,29 @@
 ```mysql
 DROP TABLE IF EXISTS `user`;
 
-CREATE TABLE `user` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `name` VARCHAR(30) DEFAULT NULL COMMENT '姓名',
-    `age` INT DEFAULT NULL COMMENT '年龄',
+CREATE TABLE `user`
+(
+    `id`    BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `name`  VARCHAR(30) DEFAULT NULL COMMENT '姓名',
+    `age`   INT         DEFAULT NULL COMMENT '年龄',
     `email` VARCHAR(50) DEFAULT NULL COMMENT '邮箱',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='用户信息表';
 ```
 
 初始化数据语句
 
 ```mysql
-DELETE FROM `user`;
+DELETE
+FROM `user`;
 
-INSERT INTO `user` (`id`, `name`, `age`, `email`) VALUES
-(1, 'Jone', 18, 'test1@baomidou.com'),
-(2, 'Jack', 20, 'test2@baomidou.com'),
-(3, 'Tom', 28, 'test3@baomidou.com'),
-(4, 'Sandy', 21, 'test4@baomidou.com'),
-(5, 'Billie', 24, 'test5@baomidou.com');
+INSERT INTO `user` (`id`, `name`, `age`, `email`)
+VALUES (1, 'Jone', 18, 'test1@baomidou.com'),
+       (2, 'Jack', 20, 'test2@baomidou.com'),
+       (3, 'Tom', 28, 'test3@baomidou.com'),
+       (4, 'Sandy', 21, 'test4@baomidou.com'),
+       (5, 'Billie', 24, 'test5@baomidou.com');
 ```
 
 增加列 gender
@@ -71,7 +74,7 @@ ALTER TABLE user
 
 # Service/Dao
 
-- Service 接口需要继承 IService； 
+- Service 接口需要继承 IService；
 - Service 实现类需要继承 ServiceImpl；
 - Dao 接口需要继承 BaseMapper。
 
@@ -92,3 +95,7 @@ JSON 类型（数组或对象）属性使用 @TableField(typeHandler = JacksonTy
 # 主键 ID 自增一
 
 需要在实体类的主键属性上添加 @TableId(type = IdType.AUTO) 注解。
+
+# 查看 SQL
+
+将 dao 包的日志级别调整为 debug，可以查看执行的 SQL 语句。

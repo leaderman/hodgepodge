@@ -3,3 +3,8 @@ spring:
     url: jdbc:mysql://dev:3306/hodgepodge?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
     username: root
     password: e2BEZPhnlmgmp@mK
+
+logging:
+  level:
+    root: info
+    com.miaoyurun.hodgepodge.java.mybatis.dao: debug
