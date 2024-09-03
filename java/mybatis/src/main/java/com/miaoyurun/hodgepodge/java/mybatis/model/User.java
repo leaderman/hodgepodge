@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @TableName(autoResultMap = true)
 public class User {
@@ -20,4 +22,6 @@ public class User {
     private String[] hobbies;
     @TableField(typeHandler = JacksonTypeHandler.class)
     private UserDetail detail;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

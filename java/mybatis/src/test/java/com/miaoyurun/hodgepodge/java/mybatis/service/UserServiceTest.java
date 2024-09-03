@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @SpringBootTest
@@ -31,6 +33,17 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testListByCreatedAt() {
+        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
+//        query.ge(User::getCreatedAt, "2024-01-01 00:00:00");
+//        query.ge(User::getCreatedAt, LocalDateTime.parse("2024-01-01T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        query.ge(User::getCreatedAt, LocalDateTime.parse("2024-01-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+        List<User> users = userService.list(query);
+        users.forEach(System.out::println);
+    }
+
+    @Test
     public void testSave() {
         User user = new User();
 
@@ -45,5 +58,14 @@ public class UserServiceTest {
         assert result;
 
         System.out.println("User ID: " + user.getId());
+    }
+
+    @Test
+    public void testUpdate() {
+        User user = userService.getById(1L);
+        user.setAge(37);
+
+        boolean result = userService.updateById(user);
+        assert result;
     }
 }

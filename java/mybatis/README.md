@@ -72,6 +72,14 @@ ALTER TABLE user
     ADD COLUMN detail varchar(128) DEFAULT '{}';
 ```
 
+增加列 created_at 和 updated_at
+
+```mysql
+ALTER TABLE user
+    ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+```
+
 # Service/Dao
 
 - Service 接口需要继承 IService；
