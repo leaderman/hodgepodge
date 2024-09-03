@@ -107,3 +107,7 @@ JSON 类型（数组或对象）属性使用 @TableField(typeHandler = JacksonTy
 # 查看 SQL
 
 将 dao 包的日志级别调整为 debug，可以查看执行的 SQL 语句。
+
+# 分页
+
+需要配置分页插件 PaginationInterceptor。

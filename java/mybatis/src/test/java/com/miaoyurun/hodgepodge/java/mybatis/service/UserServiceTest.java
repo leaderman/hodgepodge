@@ -1,6 +1,7 @@
 package com.miaoyurun.hodgepodge.java.mybatis.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.miaoyurun.hodgepodge.java.mybatis.model.Gender;
 import com.miaoyurun.hodgepodge.java.mybatis.model.User;
 import com.miaoyurun.hodgepodge.java.mybatis.model.UserDetail;
@@ -40,6 +41,17 @@ public class UserServiceTest {
         query.ge(User::getCreatedAt, LocalDateTime.parse("2024-01-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         List<User> users = userService.list(query);
+        users.forEach(System.out::println);
+    }
+
+    @Test
+    public void testPage() {
+        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
+        query.orderByDesc(User::getAge);
+
+        Page<User> page = userService.page(new Page<>(2, 3), query);
+
+        List<User> users = page.getRecords();
         users.forEach(System.out::println);
     }
 
