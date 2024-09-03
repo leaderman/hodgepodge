@@ -1,3 +1,5 @@
+# MySQL
+
 创建表语句
 
 ```mysql
@@ -24,3 +26,69 @@ INSERT INTO `user` (`id`, `name`, `age`, `email`) VALUES
 (4, 'Sandy', 21, 'test4@baomidou.com'),
 (5, 'Billie', 24, 'test5@baomidou.com');
 ```
+
+增加列 gender
+
+```mysql
+ALTER TABLE user
+    ADD COLUMN gender INT DEFAULT 0;
+```
+
+初始化列 gender 数据
+
+```mysql
+UPDATE user
+SET gender = IF(MOD(id, 2) = 0, 2, 1);
+```
+
+增加列 hobbies
+
+```mysql
+ALTER TABLE user
+    ADD COLUMN hobbies varchar(128) DEFAULT '[]';
+```
+
+初始化列 hobbies
+
+```mysql
+UPDATE user
+SET hobbies = CASE
+                  WHEN id = 1 THEN '["Reading", "Swimming"]'
+                  WHEN id = 2 THEN '["Cycling", "Hiking"]'
+                  WHEN id = 3 THEN '["Gaming", "Drawing"]'
+                  WHEN id = 4 THEN '["Cooking", "Traveling"]'
+                  WHEN id = 5 THEN '["Photography", "Dancing"]'
+    END
+WHERE id BETWEEN 1 AND 5;
+```
+
+增加列 detail
+
+```mysql
+ALTER TABLE user
+    ADD COLUMN detail varchar(128) DEFAULT '{}';
+```
+
+# Service/Dao
+
+- Service 接口需要继承 IService； 
+- Service 实现类需要继承 ServiceImpl；
+- Dao 接口需要继承 BaseMapper。
+
+# 使用 Lambda 表达式构建条件
+
+可以通过 lambda 版本的 QueryWrapper，即 LambdaQueryWrapper 来构建条件，这样可以使用 Java 属性而不是数据库列名来指定字段。
+
+# 枚举类型
+
+枚举属性使用 @EnumValue 注解，指定枚举值在数据库中存储的实际值。
+
+# JSON 类型
+
+JSON 类型（数组或对象）属性使用 @TableField(typeHandler = JacksonTypeHandler.class) 注解，指定 JSON 类型处理器。
+
+注意：必须开启映射注解 @TableName(autoResultMap = true)。
+
+# 主键 ID 自增一
+
+需要在实体类的主键属性上添加 @TableId(type = IdType.AUTO) 注解。
