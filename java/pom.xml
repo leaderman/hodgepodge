@@ -14,6 +14,7 @@
         <module>web</module>
         <module>mapstruct</module>
         <module>redis</module>
+        <module>async</module>
     </modules>
 
     <properties>
@@ -66,7 +67,6 @@
                 <version>${spring-boot-starter.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -85,8 +85,6 @@
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 
