@@ -1,0 +1,8 @@
+spring:
+  redis:
+    host: dev
+    port: 6379
+    password: HUPf0elbIgAKekBR
+  cache:
+    redis:
+      use-key-prefix: true

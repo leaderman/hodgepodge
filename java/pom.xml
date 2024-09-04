@@ -13,6 +13,7 @@
         <module>mybatis</module>
         <module>web</module>
         <module>mapstruct</module>
+        <module>redis</module>
     </modules>
 
     <properties>
@@ -58,6 +59,13 @@
                 <artifactId>spring-boot-starter-json</artifactId>
                 <version>${spring-boot-starter.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot-starter.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
