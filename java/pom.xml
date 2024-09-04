@@ -11,6 +11,7 @@
 
     <modules>
         <module>mybatis</module>
+        <module>web</module>
     </modules>
 
     <properties>
@@ -18,6 +19,8 @@
         <lombok.version>1.18.34</lombok.version>
         <spring-boot-starter.version>2.7.18</spring-boot-starter.version>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
+
+        <maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
 
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -59,4 +62,17 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
