@@ -1,5 +1,5 @@
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import { AppModule } from "./module";
 import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
@@ -16,6 +16,7 @@ async function bootstrap() {
       },
     })
   );
+
   await app.listen(3000);
 }
 
