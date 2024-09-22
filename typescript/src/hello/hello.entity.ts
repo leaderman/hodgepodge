@@ -11,3 +11,14 @@ export class GetHelloRo {
   @Type(() => Number)
   age?: number;
 }
+
+export class PostHelloRo {
+  @IsString()
+  name!: string;
+  @IsOptional()
+  @IsNumber()
+  @Min(10)
+  @Max(51)
+  @Type(() => Number)
+  age?: number;
+}
