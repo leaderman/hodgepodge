@@ -1,4 +1,4 @@
-import { greet, logMessage } from "./index";
+import { greet, logMessage } from "../src/example";
 
 describe("greet", () => {
   it("should return a greeting message", () => {
