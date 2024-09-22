@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { GetHelloRo, PostHelloRo } from "./hello.entity";
+import { GetHelloRo, PostHelloRo, User } from "./hello.entity";
 import { HelloService } from "./hello.service";
 import { ConfigService } from "@nestjs/config";
 import { Body, Post } from "@nestjs/common";
@@ -24,5 +24,27 @@ export class HelloController {
   postHello(@Body() body: PostHelloRo): object {
     console.log(body);
     return { result: this.helloService.getHello(body.name) };
+  }
+
+  @Get("users")
+  getUsers(): Promise<User[]> {
+    return this.helloService.getUsers();
+  }
+
+  @Post("user")
+  saveUser(): Promise<User> {
+    const user = new User();
+
+    user.name = "John Doe";
+    user.age = "20";
+    user.email = "john.doe@example.com";
+    user.hobbies = ["reading", "traveling"];
+    user.detail = {
+      height: 170,
+      weight: 60,
+      address: "123 Main St, Anytown, USA",
+    };
+
+    return this.helloService.saveUser(user);
   }
 }
