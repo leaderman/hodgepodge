@@ -15,9 +15,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    this.logger.error(JSON.stringify(exception));
-    this.logger.log("================================================");
-
     const code =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -36,7 +33,7 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
     this.httpAdapterHost.httpAdapter.reply(
       host.switchToHttp().getResponse(),
       body,
-      code
+      HttpStatus.OK
     );
   }
 }
