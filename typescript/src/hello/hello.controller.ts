@@ -1,11 +1,14 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Query, Logger } from "@nestjs/common";
 import { GetHelloRo, PostHelloRo, User } from "./hello.entity";
 import { HelloService } from "./hello.service";
 import { ConfigService } from "@nestjs/config";
 import { Body, Post } from "@nestjs/common";
+import { instanceToPlain } from "class-transformer";
 
 @Controller("hello")
 export class HelloController {
+  private readonly logger = new Logger(HelloController.name);
+
   constructor(
     private readonly helloService: HelloService,
     private readonly configService: ConfigService
@@ -13,10 +16,12 @@ export class HelloController {
 
   @Get("get")
   getHello(@Query() query: GetHelloRo): string {
-    console.log(query);
-    console.log("NODE_ENV: " + process.env.NODE_ENV);
-    console.log("PROFILE: " + this.configService.get("CUSTOM_PROFILE"));
-    console.log("NAME: " + this.configService.get("CUSTOM_NAME"));
+    this.logger.log(JSON.stringify(query));
+    this.logger.log(instanceToPlain(query));
+    this.logger.log("NODE_ENV: " + process.env.NODE_ENV);
+    this.logger.log("PROFILE: " + this.configService.get("CUSTOM_PROFILE"));
+    this.logger.log("NAME: " + this.configService.get("CUSTOM_NAME"));
+
     return this.helloService.getHello(query.name);
   }
 
