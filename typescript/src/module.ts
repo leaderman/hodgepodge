@@ -13,14 +13,14 @@ import { HelloModule } from "./hello/hello.module";
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         type: "mysql",
         host: configService.get("DATABASE_HOST"),
         port: configService.get("DATABASE_PORT"),
         username: configService.get("DATABASE_USERNAME"),
         password: configService.get("DATABASE_PASSWORD"),
         database: configService.get("DATABASE_NAME"),
-        driver: require("mysql2"),
+        driver: await import("mysql2"),
         entities: [User],
       }),
     }),

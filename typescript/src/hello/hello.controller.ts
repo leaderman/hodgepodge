@@ -1,9 +1,17 @@
-import { Controller, Get, Query, Logger } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Post,
+  Query,
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { instanceToPlain } from "class-transformer";
 import { GetHelloRo, PostHelloRo, User } from "./hello.entity";
 import { HelloService } from "./hello.service";
-import { ConfigService } from "@nestjs/config";
-import { Body, Post } from "@nestjs/common";
-import { instanceToPlain } from "class-transformer";
 
 @Controller("hello")
 export class HelloController {
@@ -55,6 +63,6 @@ export class HelloController {
 
   @Get("error")
   getError(): string {
-    throw new Error("This is a test error");
+    throw new HttpException("This is a test error", HttpStatus.BAD_REQUEST);
   }
 }

@@ -1,6 +1,6 @@
 import { ValidationPipe } from "@nestjs/common";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
-import { GlobalExceptionsFilter } from "./exception.filter";
+import { GlobalExceptionsFilter } from "./filter";
 import { GlobalInterceptor } from "./interceptor";
 import { AppModule } from "./module";
 
