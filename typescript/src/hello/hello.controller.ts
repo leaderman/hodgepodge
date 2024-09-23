@@ -52,4 +52,9 @@ export class HelloController {
 
     return this.helloService.saveUser(user);
   }
+
+  @Get("error")
+  getError(): string {
+    throw new Error("This is a test error");
+  }
 }
