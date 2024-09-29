@@ -1,31 +1,37 @@
 import puppeteer from "puppeteer";
-// Or import puppeteer from 'puppeteer-core';
 
-export async function getWeibo() {
-  // Launch the browser and open a new blank page
+export async function getWeibo(): Promise<void> {
+  console.time("launch");
   const browser = await puppeteer.launch();
+  console.timeEnd("launch");
   const page = await browser.newPage();
 
-  // Navigate the page to a URL.
-  await page.goto("https://developer.chrome.com/");
+  const userId = "1560906700";
+  const weiboId = "Oz6CX1S6q";
 
-  // Set screen size.
+  await page.goto(`https://weibo.com/${userId}/${weiboId}`);
+  console.log("page loaded");
+
   await page.setViewport({ width: 1080, height: 1024 });
+  console.log("viewport set");
 
-  // Type into search box.
-  await page.locator(".devsite-search-field").fill("automate beyond recorder");
+  const showResponse = await page.waitForResponse(
+    `https://weibo.com/ajax/statuses/show?id=${weiboId}&locale=zh-CN`
+  );
+  console.log("showResponse loaded");
 
-  // Wait and click on first result.
-  await page.locator(".devsite-result-item-link").click();
+  const showData = await showResponse.json();
+  const textRaw = showData.text_raw;
+  console.log(textRaw);
 
-  // Locate the full title with a unique string.
-  const textSelector = await page
-    .locator("text/Customize and automate")
-    .waitHandle();
-  const fullTitle = await textSelector?.evaluate((el) => el.textContent);
+  const longTextResponse = await page.waitForResponse(
+    `https://weibo.com/ajax/statuses/longtext?id=${weiboId}`
+  );
+  console.log("longTextResponse loaded");
 
-  // Print the full title.
-  console.log('The title of this blog post is "%s".', fullTitle);
+  const longTextData = await longTextResponse.json();
+  const longTextContent = longTextData.data.longTextContent;
+  console.log(longTextContent);
 
   await browser.close();
 }
