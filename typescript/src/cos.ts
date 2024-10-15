@@ -43,3 +43,15 @@ function getObjectUrl(key: string): string {
 
 const url = getObjectUrl(key);
 console.log(url);
+
+async function exist(key: string): Promise<boolean> {
+  await cos.headObject({
+    Bucket: "tea-1304934178", // 填入您自己的存储桶，必须字段
+    Region: "ap-beijing", // 存储桶所在地域，例如 ap-beijing，必须字段
+    Key: key, // 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段
+  });
+
+  return true;
+}
+
+exist(key + "123");
